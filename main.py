@@ -1,5 +1,3 @@
-from math import floor
-
 from Window import Window
 from game.GameBoard import GameBoard
 
@@ -15,26 +13,26 @@ window = Window()
 
 game_board = GameBoard(window.get_canvas())
 game_board.setup()
-game_board.display()
 
-window.get_canvas().create_centered_circle(0, 0, 150, 150, 100)
+def process_click(event):
+	row = int(event.y / Window.BOX_LENGTH)
+	column = int(event.x / Window.BOX_LENGTH)
+	return row, column
 
 
 def click_event(event):
-	column = floor(event.x / Window.BOX_LENGTH)
-	row = floor(event.y / Window.BOX_LENGTH)
+	row, column = process_click(event)
 	game_board.click(row, column)
-	game_board.display()
-	print("row:", row, "col:", column)
+	print("Row: " + str(row) + " Column: " + str(column))
 	print("Clicked on " + game_board.get_piece(row, column).name)
 
 
 def release_event(event):
-	print("x:" + str(event.x) + ", y:" + str(event.y))
+	row, column = process_click(event)
 
 
 window.bind_click(click_event)
-
+window.bind_release(release_event)
 
 ######
 # Create View
