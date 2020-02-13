@@ -1,7 +1,6 @@
 from Color import Color
 from Window import Window
 from game.Empty import Empty
-from game.Location import Location
 from game.Pawn import Pawn
 
 
@@ -21,8 +20,6 @@ class GameBoard():
 				else:
 					canvas.create_rectangle(i * box_length, j * box_length, i * box_length + box_length,
 											j * box_length + box_length, fill='#66442E')
-
-		self.setup()
 
 	def __str__(self):
 		output = ""
@@ -50,15 +47,19 @@ class GameBoard():
 				if self.get_piece(r, c).shade != Color.WHITE and self.get_piece(r, c).shade != Color.BLACK:
 					self.deselect_piece(r, c)
 		if isinstance(self.piece_list[row][column], Empty):
-			potential_moves = self.piece_list[row][column].get_potential_moves()
+			print(self.selected[0])
+			potential_moves = self.get_piece(*self.selected).get_potential_moves(self)
 			print('potentials:' + ', '.join([str(x) for x in potential_moves]))
-			print('we got ' + str(row) + ', ' + str(column))
-			if (row, column) in potential_moves:
-				print('gotem')
+			if [row, column] in potential_moves:
+				print('we gotem')
+				print('type ' + str(type(self.get_piece(*self.selected))))
+				print('id ' + str(self.get_piece(*self.selected).id))
+				self.move_piece(self.get_piece(*self.selected), row, column)
 		else:
 			self.select_piece(row, column)
 
 	def select_piece(self, row, column):
+		self.selected = row, column
 		self.canvas.itemconfig(self.get_piece(row, column).id, self.get_piece(row, column).select())
 
 	# for loc in self.get_piece(row, column).get_potential_moves():
@@ -67,14 +68,13 @@ class GameBoard():
 	def deselect_piece(self, row, column):
 		self.canvas.itemconfig(self.get_piece(row, column).id, self.get_piece(row, column).deselect())
 
-	def move_piece(self, old_row, old_column, new_row, new_column):
-
-		if Location(1, 3) in self.piece_list[old_row][old_column].potential_moves():
-			print("can be moved")
-
-		self.piece_list[new_row][new_column] = self.piece_list[old_column][old_row]
-		self.piece_list[old_row][old_column] = Empty[old_column][old_row]
-		return True
+	def move_piece(self, game_piece, old_row, old_column, new_row, new_column):
+		self.piece_list[new_row][new_column] = game_piece
+		self.piece_list[old_row][old_column] = Empty()
+		game_piece.row = new_row
+		game_piece.column = new_column
+		self.canvas.move(game_piece.id, new_row, new_column)
+		print('moved')
 
 	def get_piece(self, row, column):
 		column = int(column)
