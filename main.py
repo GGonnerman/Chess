@@ -2,11 +2,10 @@ from __future__ import print_function
 
 from Tkinter import *
 
-from game.game_board import game_board
-
 #####
 # Create root window
 #####
+from game.game_board import game_board
 
 root = Tk();
 
