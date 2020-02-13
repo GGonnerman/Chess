@@ -23,10 +23,10 @@ window.get_canvas().create_centered_circle(0, 0, 150, 150, 100)
 def click_event(event):
 	column = floor(event.x / Window.BOX_LENGTH)
 	row = floor(event.y / Window.BOX_LENGTH)
-	game_board.get_piece(row, column).select()
-	game_board.get_piece(row, column).display()
+	game_board.click(row, column)
+	game_board.display()
 	print("row:", row, "col:", column)
-	print("Clicked on " + game_board.get_piece(row, column))
+	print("Clicked on " + game_board.get_piece(row, column).name)
 
 
 def release_event(event):

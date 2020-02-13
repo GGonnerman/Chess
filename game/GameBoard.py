@@ -37,21 +37,22 @@ class GameBoard():
 	def setup(self):
 
 		for column in range(8):
-			self.piece_list[1][column] = Pawn(Color.BLACK, 1, column, self.canvas)
-			self.piece_list[6][column] = Pawn(Color.WHITE, 6, column, self.canvas)
+			self.piece_list[1][column] = Pawn(Color.BLACK, 1, column, self.canvas, self)
+			self.piece_list[6][column] = Pawn(Color.WHITE, 6, column, self.canvas, self)
 
 		for column in [0, 7]:
-			self.piece_list[0][column] = Pawn(Color.BLACK, 0, column, self.canvas)
-			self.piece_list[7][column] = Pawn(Color.WHITE, 7, column, self.canvas)
+			self.piece_list[0][column] = Pawn(Color.BLACK, 0, column, self.canvas, self)
+			self.piece_list[7][column] = Pawn(Color.WHITE, 7, column, self.canvas, self)
 
-	def click(self, x, y):
-		self.select_piece(x, y)
+	def click(self, row, column):
+		self.select_piece(row, column)
 
 	def drag(self):
 		pass
 
-	def select_piece(self, x, y):
-		self.get_piece(x, y).highlight()
+	def select_piece(self, row, column):
+		self.get_piece(row, column).select()
+		self.get_piece(row, column).display()
 
 	def display(self):
 		for column in self.piece_list:
@@ -71,4 +72,4 @@ class GameBoard():
 		column = int(column)
 		row = int(row)
 		print("got row:", row, "col:", column)
-		return self.piece_list[row][column].name
+		return self.piece_list[row][column]

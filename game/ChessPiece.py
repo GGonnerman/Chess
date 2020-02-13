@@ -1,10 +1,9 @@
 from Window import Window
-from game.Location import Location
 
 
 class ChessPiece(object):
 
-	def __init__(self, name, color, row, column, canvas, shade="#FFF"):
+	def __init__(self, name, color, row, column, canvas, gameboard, shade="#FFF"):
 		self.name = name
 		self.selected = False
 		self.color = color
@@ -12,6 +11,7 @@ class ChessPiece(object):
 		self.column = column
 		self.shade = shade
 		self.canvas = canvas
+		self.gameboard = gameboard
 
 	def __str__(self):
 		return self.name
@@ -29,15 +29,15 @@ class ChessPiece(object):
 		print('displaying chess piece')
 		box_length = Window.BOX_LENGTH
 		diameter = 30
-		self.canvas.create_centered_circle(self.row * box_length, self.column * box_length,
-										   self.row * (box_length + 1), self.column * (box_length + 1),
-										   diameter, fill="blue", outline="#DDD", width=4)
+		self.id = self.canvas.create_centered_circle(self.column * box_length, self.row * box_length,
+													 self.column * (box_length + 1), self.row * (box_length + 1),
+													 diameter, fill="blue", outline="#DDD", width=4)
 
 	def display_potential_moves(self):
 		pass
 
 	def get_potential_moves(self):
-		return Location(1, 2)
+		pass
 
 	def check_if_can_move(self):
 		pass
