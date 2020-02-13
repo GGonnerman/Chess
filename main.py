@@ -1,53 +1,48 @@
-from __future__ import print_function
+from math import floor
 
-from Tkinter import *
+from Window import Window
+from game.GameBoard import GameBoard
 
 #####
 # Create root window
 #####
-from game.game_board import game_board
 
-root = Tk();
-
-x = 0
-y = 0
-r = 0
-
+window = Window()
 
 ######
 # Create Controller
 #######
+
+game_board = GameBoard(window.get_canvas())
+game_board.setup()
+game_board.display()
+
+window.get_canvas().create_centered_circle(0, 0, 150, 150, 100)
+
+
 def click_event(event):
-	canvas.focus_set()
-	print("x:" + str(event.x) + ", y:" + str(event.y))
+	column = floor(event.x / Window.BOX_LENGTH)
+	row = floor(event.y / Window.BOX_LENGTH)
+	game_board.get_piece(row, column).select()
+	game_board.get_piece(row, column).display()
+	print("row:", row, "col:", column)
+	print("Clicked on " + game_board.get_piece(row, column))
 
 
 def release_event(event):
-	canvas.focus()
 	print("x:" + str(event.x) + ", y:" + str(event.y))
 
 
-def process_click_event(x, y):
-	x /= 8
-	y /= 8
-	game_board.click(x, y)
+window.bind_click(click_event)
 
 
 ######
 # Create View
 #######
 # Create and place a canvas
-canvas = Canvas(root, width=300, height=300, background='#AAAAAA')
-canvas.grid(row=0, rowspan=2, column=1)
-canvas.bind("<Button-1>", click_event)
-canvas.bind("<ButtonRelease-1>", release_event)
-gb = game_board()
-gb.display(canvas)
-print(gb)
 
-# Create a circle on the canvas to match the initial model
-circle_item = canvas.create_oval(x - r, y - r, x + r, y + r, outline='#000000', fill='#00FFFF')
 #######
 # Event Loop
 #######
+root = window.get_root()
 root.mainloop()
