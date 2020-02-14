@@ -1,4 +1,4 @@
 class Color():
 	NONE = 0
-	WHITE = '#FFF'
-	BLACK = '#000'
+	WHITE = 1
+	BLACK = 2
