@@ -54,7 +54,7 @@ class GameBoard():
 				print('we gotem')
 				print('type ' + str(type(self.get_piece(*self.selected))))
 				print('id ' + str(self.get_piece(*self.selected).id))
-				self.move_piece(self.get_piece(*self.selected), row, column)
+				self.move_piece(self.get_piece(*self.selected), self.selected[0], self.selected[1], row, column)
 		else:
 			self.select_piece(row, column)
 
@@ -70,7 +70,7 @@ class GameBoard():
 
 	def move_piece(self, game_piece, old_row, old_column, new_row, new_column):
 		self.piece_list[new_row][new_column] = game_piece
-		self.piece_list[old_row][old_column] = Empty()
+		self.piece_list[old_row][old_column] = Empty(old_row, old_column, self.canvas)
 		game_piece.row = new_row
 		game_piece.column = new_column
 		self.canvas.move(game_piece.id, new_row, new_column)
