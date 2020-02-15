@@ -22,6 +22,7 @@ class TimeWidget():
 		self.white_time[2] += 1
 		self.white_time[1] = (int)(self.white_time[2] / 10)
 		if self.white_time[1] >= 60:
+			self.white_time[2] = 0
 			self.white_time[1] = 0
 			self.white_time[0] += 1
 		self.display()
@@ -34,6 +35,7 @@ class TimeWidget():
 		self.black_time[2] += 1
 		self.black_time[1] = (int)(self.black_time[2] / 10)
 		if self.black_time[1] >= 60:
+			self.black_time[2] = 0
 			self.black_time[1] = 0
 			self.black_time[0] += 1
 		self.display()
