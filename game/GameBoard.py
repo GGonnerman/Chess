@@ -1,4 +1,4 @@
-from Color import Color
+from game.Color import Color
 from TimeWidget import TimeWidget
 
 from game.Bishop import Bishop

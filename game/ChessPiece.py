@@ -1,4 +1,4 @@
-import Tkinter
+import tkinter
 
 from Window import Window
 from game.Color import Color
@@ -15,7 +15,7 @@ class ChessPiece(object):
 		if color == Color.NONE: return
 
 		file_name = "White_" + name if color == Color.WHITE else "Black_" + name
-		self._photo_image = Tkinter.PhotoImage(file="media/" + file_name + ".png")
+		self._photo_image = tkinter.PhotoImage(file="media/" + file_name + ".png")
 		self.id = canvas.create_image(self.get_coords(), image=self._photo_image)
 
 	def __str__(self):

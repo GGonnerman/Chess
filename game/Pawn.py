@@ -1,4 +1,4 @@
-from ChessPiece import ChessPiece
+from game.ChessPiece import ChessPiece
 from game.Color import Color
 from game.Empty import Empty
 from game.SetMovement import SetMovement

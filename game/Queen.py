@@ -1,4 +1,4 @@
-from ChessPiece import ChessPiece
+from game.ChessPiece import ChessPiece
 from game.ContinousMovement import ContinousMovement
 
 

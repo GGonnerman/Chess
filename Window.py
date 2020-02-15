@@ -1,4 +1,4 @@
-import Tkinter
+import tkinter
 
 from TimeWidget import TimeWidget
 
@@ -8,9 +8,9 @@ class Window():
 	BOX_LENGTH = SIDE_LENGTH / 8
 
 	def __init__(self):
-		self.root = Tkinter.Tk();
+		self.root = tkinter.Tk();
 		self.root.resizable(0, 0)
-		self.canvas = Tkinter.Canvas(self.root, width=Window.SIDE_LENGTH, height=Window.SIDE_LENGTH,
+		self.canvas = tkinter.Canvas(self.root, width=Window.SIDE_LENGTH, height=Window.SIDE_LENGTH,
 									 background='#AAAAAA')
 		self.canvas.grid(row=0, column=0)
 		self.timer = TimeWidget(self.root, self.canvas)

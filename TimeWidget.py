@@ -1,4 +1,4 @@
-import Tkinter
+import tkinter
 
 from game.Color import Color
 
@@ -7,7 +7,7 @@ class TimeWidget():
 	turn = Color.WHITE
 
 	def __init__(self, root, canvas):
-		self.id = Tkinter.Text(height=2, width=17)
+		self.id = tkinter.Text(height=2, width=17)
 		self.id.grid(row=0, column=1)
 		self.canvas = canvas
 		self.white_time = [0, 0, 0]
@@ -45,6 +45,6 @@ class TimeWidget():
 			self.canvas.after(100, self.update_black)
 
 	def display(self):
-		self.id.delete("1.0", Tkinter.END)
-		self.id.insert(Tkinter.END, 'Black time: %02d:%02d\nWhite time: %02d:%02d' % (
+		self.id.delete("1.0", tkinter.END)
+		self.id.insert(tkinter.END, 'Black time: %02d:%02d\nWhite time: %02d:%02d' % (
 		self.black_time[0], self.black_time[1], self.white_time[0], self.white_time[1]))
