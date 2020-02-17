@@ -1,3 +1,4 @@
+import copy
 import tkinter
 
 from Window import Window
@@ -20,6 +21,15 @@ class ChessPiece(object):
 
 	def __str__(self):
 		return self.name
+
+	def __deepcopy__(self, memodict={}):
+		clone = copy.copy(self)
+		for name, value in vars(self).items():
+			if name not in ['_photo_image']:
+				setattr(clone, name, copy.deepcopy(value, memodict))
+			else:
+				setattr(clone, name, None)
+		return clone
 
 	def get_potential_moves(self, gameboard):
 		return []

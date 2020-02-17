@@ -1,13 +1,18 @@
+import tkinter
+
 from game.Color import Color
 from TimeWidget import TimeWidget
 
 from game.Bishop import Bishop
 from game.Box import Box
+from game.Empty import Empty
 from game.King import King
 from game.Knight import Knight
 from game.Pawn import Pawn
 from game.Queen import Queen
 from game.Rook import Rook
+
+import copy
 
 
 class GameBoard():
@@ -18,63 +23,125 @@ class GameBoard():
 		self.selected = -1, -1
 		self.movement_hints = movement_hints
 		self.turn = Color.WHITE
+		self.white_pieces = []
+		self.black_pieces = []
 
 	def __str__(self):
 		output = ""
 		for row in range(len(self.piece_list)):
 			for column in range(len(self.piece_list)):
-				output += self.piece_list[row][column].name
+				output += self.piece_list[row][column].name()
 				if column == len(self.piece_list) - 1: break
 				output += " "
 			output += "\n" if row < len(self.piece_list) - 1 else ""
 		return output
 
-	def setup(self):
+	def __deepcopy__(self, memodict={}):
+		clone = copy.copy(self)
+		for name, value in vars(self).items():
+			if name not in ['canvas']:
+				setattr(clone, name, copy.deepcopy(value, memodict))
+			else:
+				setattr(clone, name, None)
+		return clone
 
+	def setup(self):
 		for column in range(8):
-			self.piece_list[1][column].set_piece(Pawn(Color.BLACK, 1, column, self.canvas))
-			self.piece_list[6][column].set_piece(Pawn(Color.WHITE, 6, column, self.canvas))
+			self.black_pieces.append(self.piece_list[1][column].set_piece(Pawn(Color.BLACK, 1, column, self.canvas)))
+			self.white_pieces.append(self.piece_list[6][column].set_piece(Pawn(Color.WHITE, 6, column, self.canvas)))
 
 		for column in [0, 7]:
-			self.piece_list[0][column].set_piece(Rook(Color.BLACK, 0, column, self.canvas))
-			self.piece_list[7][column].set_piece(Rook(Color.WHITE, 7, column, self.canvas))
+			self.black_pieces.append(self.piece_list[0][column].set_piece(Rook(Color.BLACK, 0, column, self.canvas)))
+			self.white_pieces.append(self.piece_list[7][column].set_piece(Rook(Color.WHITE, 7, column, self.canvas)))
 
 		for column in [2, 5]:
-			self.piece_list[0][column].set_piece(Bishop(Color.BLACK, 0, column, self.canvas))
-			self.piece_list[7][column].set_piece(Bishop(Color.WHITE, 7, column, self.canvas))
+			self.black_pieces.append(self.piece_list[0][column].set_piece(Bishop(Color.BLACK, 0, column, self.canvas)))
+			self.white_pieces.append(self.piece_list[7][column].set_piece(Bishop(Color.WHITE, 7, column, self.canvas)))
 
 		for column in [1, 6]:
-			self.piece_list[0][column].set_piece(Knight(Color.BLACK, 0, column, self.canvas))
-			self.piece_list[7][column].set_piece(Knight(Color.WHITE, 7, column, self.canvas))
+			self.black_pieces.append(self.piece_list[0][column].set_piece(Knight(Color.BLACK, 0, column, self.canvas)))
+			self.white_pieces.append(self.piece_list[7][column].set_piece(Knight(Color.WHITE, 7, column, self.canvas)))
 
-		self.piece_list[0][3].set_piece(Queen(Color.BLACK, 0, 3, self.canvas))
-		self.piece_list[7][3].set_piece(Queen(Color.WHITE, 7, 3, self.canvas))
+		self.black_pieces.append(self.piece_list[0][3].set_piece(Queen(Color.BLACK, 0, 3, self.canvas)))
+		self.white_pieces.append(self.piece_list[7][3].set_piece(Queen(Color.WHITE, 7, 3, self.canvas)))
 
-		self.piece_list[0][4].set_piece(King(Color.BLACK, 0, 4, self.canvas))
-		self.piece_list[7][4].set_piece(King(Color.WHITE, 7, 4, self.canvas))
+		self.black_pieces.append(self.piece_list[0][4].set_piece(King(Color.BLACK, 0, 4, self.canvas)))
+		self.white_pieces.append(self.piece_list[7][4].set_piece(King(Color.WHITE, 7, 4, self.canvas)))
+
+	def enact_win(self):
+		TimeWidget.flip_turn()
+		TimeWidget.stop()
+		text = tkinter.Text(height=1, width=11)
+		text.grid(row=0, column=0)
+		if self.turn == Color.WHITE:
+			text.insert(tkinter.END, "Black Wins!")
+		else:
+			text.insert(tkinter.END, "White Wins!")
+		text.configure(state='disabled')
 
 	def flip_turn(self):
 		self.turn = Color.WHITE if self.turn == Color.BLACK else Color.BLACK
 		TimeWidget.flip_turn()
 
-	def check_for_check(self):
+	def is_in_check(self, color, row=-1, column=-1):
+		if color == Color.WHITE:
+			piece_list = self.white_pieces
+		else:
+			piece_list = self.black_pieces
+
+		#print(color)
+		for piece in piece_list:
+			pass
+			#print(piece.color)
+
+		if row == -1 or column == -1:
+			king_position = [piece_list[-1].row, piece_list[-1].column]
+		else:
+			king_position = [row, column]
+
+		#print('king color', piece_list[-1].color)
+		#print('is_in_check king position', king_position)
+
+		in_check = False
 		for row in range(len(self.piece_list)):
 			for column in range(len(self.piece_list[0])):
-				if isinstance(self.get_piece(row, column), King):
-					if self.get_piece(row, column).color == Color.BLACK:
-						black_king_position = [row, column]
-					else:
-						white_king_position = [row, column]
-		print('Black king position:', black_king_position)
-		print('White king position:', white_king_position)
+				piece = self.get_piece(row, column)
+				if isinstance(piece, Empty): continue
+				#print('piece name', piece.name, 'color', piece.color, piece.get_potential_moves(self))
+				if piece.color != color and king_position in piece.get_potential_moves(self):
+					in_check = True
+					#print('checked by ', self.piece_list[row][column].get_piece().name)
+		return in_check
+
+	def is_in_checkmate(self, color):
+		if color == Color.WHITE:
+			piece_list = self.white_pieces
+		else:
+			piece_list = self.black_pieces
+
 		for row in range(len(self.piece_list)):
 			for column in range(len(self.piece_list[0])):
-				if self.get_piece(row, column).color == Color.BLACK:
-					if black_king_position in self.get_piece(row, column).get_potential_moves(self):
-						print('Black king in check')
-				else:
-					if white_king_position in self.get_piece(row, column).get_potential_moves(self):
-						print('White king in check')
+				piece = self.get_piece(row, column)
+				if isinstance(piece, Empty) or piece.color != color: continue
+				for move in piece.get_potential_moves(self):
+					if not self.test_move(piece, row, column, move[0], move[1]):
+						print('not in mate because of', piece.name, move[0], move[1])
+						return False
+		print("You've been beaten")
+		return True
+
+	# Tests to see if a move would put the mover into check
+	def test_move(self, game_piece, old_row, old_column, new_row, new_column):
+		fake_board = copy.deepcopy(self)
+		game_piece = copy.deepcopy(game_piece)
+		fake_board.piece_list[new_row][new_column].set_piece(game_piece)
+		fake_board.piece_list[old_row][old_column].delete_piece()
+		game_piece.row = new_row
+		game_piece.column = new_column
+		if isinstance(game_piece, King) and game_piece.color == fake_board.turn:
+			return fake_board.is_in_check(fake_board.turn, new_row, new_column)
+		else:
+			return fake_board.is_in_check(fake_board.turn)
 
 	def clear_selections(self):
 		for row in range(len(self.piece_list)):
@@ -83,16 +150,20 @@ class GameBoard():
 					self.deselect_piece(row, column)
 
 	def click(self, row, column):
+
 		if self.piece_list[row][column].highlighted:
+			if self.test_move(self.get_piece(*self.selected), self.selected[0], self.selected[1], row, column): return
 			self.move_piece(self.get_piece(*self.selected), self.selected[0], self.selected[1], row, column)
 			self.flip_turn()
 			self.clear_selections()
-			self.check_for_check()
+			if self.is_in_checkmate(self.turn):
+				self.enact_win()
+
+		print(self.movement_hints)
 
 		if self.get_piece(row, column).color == self.turn:
 			self.clear_selections()
 			self.select_piece(row, column)
-			self.check_for_check()
 
 	def select_piece(self, row, column):
 		self.selected = row, column
@@ -105,6 +176,16 @@ class GameBoard():
 		self.canvas.itemconfig(self.piece_list[row][column].id, self.piece_list[row][column].clear_coloring())
 
 	def move_piece(self, game_piece, old_row, old_column, new_row, new_column):
+		# simple check for end condition
+		# if isinstance(self.get_piece(new, new), King): self.end_game()
+
+		# Delete old reference to item, since it has been overridden
+		# If not here, images won't be deleted... very difficult to debug
+		if self.get_piece(new_row, new_column) in self.white_pieces:
+			self.white_pieces.remove(self.get_piece(new_row, new_column))
+		if self.get_piece(new_row, new_column) in self.black_pieces:
+			self.black_pieces.remove(self.get_piece(new_row, new_column))
+
 		self.piece_list[new_row][new_column].set_piece(game_piece)
 		self.piece_list[old_row][old_column].delete_piece()
 		game_piece.row = new_row
@@ -112,7 +193,7 @@ class GameBoard():
 		self.canvas.coords(game_piece.id, game_piece.get_coords())
 
 	def has_piece(self, row, column):
-		return row >= 0 and column >= 0 and row < len(self.piece_list) and column < len(self.piece_list[0])
+		return 0 <= row < len(self.piece_list) and 0 <= column < len(self.piece_list[0])
 
 	def get_piece(self, row, column):
 		column = int(column)

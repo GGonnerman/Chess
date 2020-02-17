@@ -1,3 +1,5 @@
+import copy
+
 from Window import Window
 from game.Empty import Empty
 
@@ -16,15 +18,37 @@ class Box():
 		self.movement_hints = movement_hints
 		self.selected = False
 		self.highlighted = False
+		self.issue = False
+
+
+	def name(self): return self.piece.name
+
+	def __deepcopy__(self, memodict={}):
+		clone = copy.copy(self)
+		for name, value in vars(self).items():
+			if name not in ['canvas']:
+				setattr(clone, name, copy.deepcopy(value, memodict))
+			else:
+				setattr(clone, name, None)
+		return clone
 
 	def delete_piece(self):
 		self.piece = Empty(self.column, self.row, self.canvas)
 
 	def set_piece(self, piece):
 		self.piece = piece
+		return piece
 
 	def get_piece(self):
 		return self.piece
+
+	def show_issue(self):
+		self.issue = True
+		color = '#FB6F6F' if self.color == '#F7ECCA' else '#662E2E'
+		if self.movement_hints:
+			return {'fill': color}
+		else:
+			return {'fill': self.color}
 
 	def highlight(self):
 		self.highlighted = True
@@ -40,5 +64,5 @@ class Box():
 		return {'fill': color}
 
 	def clear_coloring(self):
-		self.selected = self.highlighted = False
+		self.selected = self.highlighted = self.issue = False
 		return {'fill': self.color}
