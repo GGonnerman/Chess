@@ -11,6 +11,11 @@ window = Window()
 # Create Controller
 #######
 
+#TODO: chess960 (random backrow)
+#TODO: Intro screen - chess type selection
+#TODO: Display opening type
+#TODO: AI - give input through value at diff locations,
+
 game_board = GameBoard(window.get_canvas(), movement_hints=True)
 game_board.setup()
 
