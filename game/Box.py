@@ -36,6 +36,7 @@ class Box():
 		self.piece = Empty(self.column, self.row, self.canvas)
 
 	def set_piece(self, piece):
+		self.delete_piece()
 		self.piece = piece
 		return piece
 

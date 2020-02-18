@@ -1,9 +1,12 @@
 import copy
 
-from game import Knight
+from game.Bishop import Bishop
 from game.ChessPiece import ChessPiece
 from game.Color import Color
+from game.Knight import Knight
 from game.Empty import Empty
+from game.Queen import Queen
+from game.Rook import Rook
 from game.SetMovement import SetMovement
 
 import tkinter
@@ -13,6 +16,7 @@ class Pawn(ChessPiece, SetMovement):
 	def __init__(self, color, row, column, canvas):
 		super(Pawn, self).__init__("Pawn", color, row, column, canvas)
 		self.popupRoot = None
+		self.new_piece = None
 
 	def __deepcopy__(self, memodict={}):
 		clone = copy.copy(self)
@@ -28,32 +32,35 @@ class Pawn(ChessPiece, SetMovement):
 		self.popupRoot.wm_title("Pawn Selection")
 		popupCanvas = tkinter.Canvas(self.popupRoot, background="#101010")
 		print('created popup')
-		knight = tkinter.Button(self.popupRoot, text="Knight", command=self.selectKnight)
+		knight = tkinter.Button(self.popupRoot, text="Knight", command=lambda: self.selectKnight(color, row, column, canvas))
 		knight.pack()
-		rook = tkinter.Button(self.popupRoot, text="Rook", command=self.selectRook)
+		rook = tkinter.Button(self.popupRoot, text="Rook", command=lambda: self.selectRook(color, row, column, canvas))
 		rook.pack()
-		bishop = tkinter.Button(self.popupRoot, text="Bishop", command=self.selectBishop)
+		bishop = tkinter.Button(self.popupRoot, text="Bishop", command=lambda: self.selectBishop(color, row, column, canvas))
 		bishop.pack()
-		queen = tkinter.Button(self.popupRoot, text="Queen", command=self.selectQueen)
+		queen = tkinter.Button(self.popupRoot, text="Queen", command=lambda: self.selectQueen(color, row, column, canvas))
 		queen.pack()
 		knight.wait_window(self.popupRoot)
-		return self.new_piece(color, row, column, canvas)
+		return self.new_piece
 
-	def selectKnight(self):
+	def selectKnight(self, *args):
 		print("Knight is chosen")
-		self.new_piece = Knight
+		self.new_piece = Knight(*args)
 		self.popupRoot.destroy()
 
-	def selectRook(self):
+	def selectRook(self, *args):
 		print("Rook is chosen")
+		self.new_piece = Rook(*args)
 		self.popupRoot.destroy()
 
-	def selectBishop(self):
+	def selectBishop(self, *args):
 		print("Bishop is chosen")
+		self.new_piece = Bishop(*args)
 		self.popupRoot.destroy()
 
-	def selectQueen(self):
+	def selectQueen(self, *args):
 		print("Queen is chosen")
+		self.new_piece = Queen(*args)
 		self.popupRoot.destroy()
 
 	def get_potential_moves(self, gameboard):

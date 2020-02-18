@@ -15,7 +15,6 @@ window = Window()
 #TODO: Intro screen - chess type selection
 #TODO: Display opening type
 #TODO: AI - give input through value at diff locations,
-# TODO: Stale mate???
 # TODO: end game button?
 # TODO: restart button?
 

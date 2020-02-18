@@ -153,11 +153,17 @@ class GameBoard():
 		if self.piece_list[row][column].highlighted:
 			if self.test_move(self.get_piece(*self.selected), self.selected[0], self.selected[1], row, column): return
 			self.move_piece(self.get_piece(*self.selected), self.selected[0], self.selected[1], row, column)
-			self.flip_turn()
 			self.clear_selections()
-			if isinstance(self.get_piece(row, column), Pawn):
-				self.piece_list[row][column].set_piece(self.get_piece(row, column).promote(self.turn, row, column, self.canvas))
-				print('setted')
+			piece = self.get_piece(row, column)
+			if isinstance(piece, Pawn):
+				if self.turn == Color.WHITE:
+					piece_list = self.white_pieces
+				else:
+					piece_list = self.black_pieces
+				piece_list.remove(piece)
+				self.piece_list[row][column].set_piece(piece.promote(self.turn, row, column, self.canvas))
+				piece_list.insert(0, self.get_piece(row, column))
+			self.flip_turn()
 			if self.is_in_checkmate(self.turn):
 				self.end_game(self.turn)
 			elif not self.has_any_moves(self.turn):
