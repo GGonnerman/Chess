@@ -1,13 +1,60 @@
+import copy
+
+from game import Knight
 from game.ChessPiece import ChessPiece
 from game.Color import Color
 from game.Empty import Empty
 from game.SetMovement import SetMovement
 
+import tkinter
 
 class Pawn(ChessPiece, SetMovement):
 
 	def __init__(self, color, row, column, canvas):
 		super(Pawn, self).__init__("Pawn", color, row, column, canvas)
+		self.popupRoot = None
+
+	def __deepcopy__(self, memodict={}):
+		clone = copy.copy(self)
+		for name, value in vars(self).items():
+			if name not in ['_photo_image', 'popupRoot']:
+				setattr(clone, name, copy.deepcopy(value, memodict))
+			else:
+				setattr(clone, name, None)
+		return clone
+
+	def promote(self, color, row, column, canvas):
+		self.popupRoot = tkinter.Tk()
+		self.popupRoot.wm_title("Pawn Selection")
+		popupCanvas = tkinter.Canvas(self.popupRoot, background="#101010")
+		print('created popup')
+		knight = tkinter.Button(self.popupRoot, text="Knight", command=self.selectKnight)
+		knight.pack()
+		rook = tkinter.Button(self.popupRoot, text="Rook", command=self.selectRook)
+		rook.pack()
+		bishop = tkinter.Button(self.popupRoot, text="Bishop", command=self.selectBishop)
+		bishop.pack()
+		queen = tkinter.Button(self.popupRoot, text="Queen", command=self.selectQueen)
+		queen.pack()
+		knight.wait_window(self.popupRoot)
+		return self.new_piece(color, row, column, canvas)
+
+	def selectKnight(self):
+		print("Knight is chosen")
+		self.new_piece = Knight
+		self.popupRoot.destroy()
+
+	def selectRook(self):
+		print("Rook is chosen")
+		self.popupRoot.destroy()
+
+	def selectBishop(self):
+		print("Bishop is chosen")
+		self.popupRoot.destroy()
+
+	def selectQueen(self):
+		print("Queen is chosen")
+		self.popupRoot.destroy()
 
 	def get_potential_moves(self, gameboard):
 		potential_moves = []

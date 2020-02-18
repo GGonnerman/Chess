@@ -25,6 +25,7 @@ class GameBoard():
 		self.turn = Color.WHITE
 		self.white_pieces = []
 		self.black_pieces = []
+		self.game_over = False
 
 	def __str__(self):
 		output = ""
@@ -69,9 +70,13 @@ class GameBoard():
 		self.white_pieces.append(self.piece_list[7][4].set_piece(King(Color.WHITE, 7, 4, self.canvas)))
 
 	def end_game(self, color):
+		self.game_over = True
 		TimeWidget.flip_turn()
 		TimeWidget.stop()
-		text = tkinter.Text(height=1, width=11)
+		if color == Color.NONE:
+			text = tkinter.Text(height=1, width=9)
+		else:
+			text = tkinter.Text(height=1, width=11)
 		text.grid(row=0, column=0)
 		if color == Color.WHITE:
 			text.insert(tkinter.END, "Black Wins!")
@@ -143,18 +148,20 @@ class GameBoard():
 					self.deselect_piece(row, column)
 
 	def click(self, row, column):
+		if self.game_over: return
 
 		if self.piece_list[row][column].highlighted:
 			if self.test_move(self.get_piece(*self.selected), self.selected[0], self.selected[1], row, column): return
 			self.move_piece(self.get_piece(*self.selected), self.selected[0], self.selected[1], row, column)
 			self.flip_turn()
 			self.clear_selections()
-			if not self.has_any_moves(self.turn):
-				self.end_game(Color.NONE)
-			elif self.is_in_checkmate(self.turn):
+			if isinstance(self.get_piece(row, column), Pawn):
+				self.piece_list[row][column].set_piece(self.get_piece(row, column).promote(self.turn, row, column, self.canvas))
+				print('setted')
+			if self.is_in_checkmate(self.turn):
 				self.end_game(self.turn)
-
-		print(self.movement_hints)
+			elif not self.has_any_moves(self.turn):
+				self.end_game(Color.NONE)
 
 		if self.get_piece(row, column).color == self.turn:
 			self.clear_selections()
