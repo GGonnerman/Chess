@@ -68,15 +68,17 @@ class GameBoard():
 		self.black_pieces.append(self.piece_list[0][4].set_piece(King(Color.BLACK, 0, 4, self.canvas)))
 		self.white_pieces.append(self.piece_list[7][4].set_piece(King(Color.WHITE, 7, 4, self.canvas)))
 
-	def enact_win(self):
+	def end_game(self, color):
 		TimeWidget.flip_turn()
 		TimeWidget.stop()
 		text = tkinter.Text(height=1, width=11)
 		text.grid(row=0, column=0)
-		if self.turn == Color.WHITE:
+		if color == Color.WHITE:
 			text.insert(tkinter.END, "Black Wins!")
-		else:
+		elif color == Color.BLACK:
 			text.insert(tkinter.END, "White Wins!")
+		else:
+			text.insert(tkinter.END, "Stalemate")
 		text.configure(state='disabled')
 
 	def flip_turn(self):
@@ -89,31 +91,24 @@ class GameBoard():
 		else:
 			piece_list = self.black_pieces
 
-		#print(color)
-		for piece in piece_list:
-			pass
-			#print(piece.color)
-
 		if row == -1 or column == -1:
 			king_position = [piece_list[-1].row, piece_list[-1].column]
 		else:
 			king_position = [row, column]
-
-		#print('king color', piece_list[-1].color)
-		#print('is_in_check king position', king_position)
 
 		in_check = False
 		for row in range(len(self.piece_list)):
 			for column in range(len(self.piece_list[0])):
 				piece = self.get_piece(row, column)
 				if isinstance(piece, Empty): continue
-				#print('piece name', piece.name, 'color', piece.color, piece.get_potential_moves(self))
 				if piece.color != color and king_position in piece.get_potential_moves(self):
 					in_check = True
-					#print('checked by ', self.piece_list[row][column].get_piece().name)
 		return in_check
 
 	def is_in_checkmate(self, color):
+		return self.is_in_check(self.turn) and not self.has_any_moves(self.turn)
+
+	def has_any_moves(self, color):
 		if color == Color.WHITE:
 			piece_list = self.white_pieces
 		else:
@@ -125,10 +120,8 @@ class GameBoard():
 				if isinstance(piece, Empty) or piece.color != color: continue
 				for move in piece.get_potential_moves(self):
 					if not self.test_move(piece, row, column, move[0], move[1]):
-						print('not in mate because of', piece.name, move[0], move[1])
-						return False
-		print("You've been beaten")
-		return True
+						return True
+		return False
 
 	# Tests to see if a move would put the mover into check
 	def test_move(self, game_piece, old_row, old_column, new_row, new_column):
@@ -156,8 +149,10 @@ class GameBoard():
 			self.move_piece(self.get_piece(*self.selected), self.selected[0], self.selected[1], row, column)
 			self.flip_turn()
 			self.clear_selections()
-			if self.is_in_checkmate(self.turn):
-				self.enact_win()
+			if not self.has_any_moves(self.turn):
+				self.end_game(Color.NONE)
+			elif self.is_in_checkmate(self.turn):
+				self.end_game(self.turn)
 
 		print(self.movement_hints)
 
@@ -176,9 +171,6 @@ class GameBoard():
 		self.canvas.itemconfig(self.piece_list[row][column].id, self.piece_list[row][column].clear_coloring())
 
 	def move_piece(self, game_piece, old_row, old_column, new_row, new_column):
-		# simple check for end condition
-		# if isinstance(self.get_piece(new, new), King): self.end_game()
-
 		# Delete old reference to item, since it has been overridden
 		# If not here, images won't be deleted... very difficult to debug
 		if self.get_piece(new_row, new_column) in self.white_pieces:
