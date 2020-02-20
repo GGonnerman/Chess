@@ -25,6 +25,7 @@ class GameBoard():
 		self.turn = Color.WHITE
 		self.white_pieces = []
 		self.black_pieces = []
+		self.paused = False
 		self.game_over = False
 
 	def __str__(self):
@@ -148,20 +149,23 @@ class GameBoard():
 					self.deselect_piece(row, column)
 
 	def click(self, row, column):
-		if self.game_over: return
+		if self.game_over or self.paused: return
 
 		if self.piece_list[row][column].highlighted:
 			if self.test_move(self.get_piece(*self.selected), self.selected[0], self.selected[1], row, column): return
 			self.move_piece(self.get_piece(*self.selected), self.selected[0], self.selected[1], row, column)
 			self.clear_selections()
 			piece = self.get_piece(row, column)
-			if isinstance(piece, Pawn):
+			if isinstance(piece, Pawn) and ((self.turn == Color.WHITE and piece.row == 0) or (self.turn == Color.BLACK and piece.row == 7)):
 				if self.turn == Color.WHITE:
 					piece_list = self.white_pieces
 				else:
+					if piece.row != 7: return
 					piece_list = self.black_pieces
 				piece_list.remove(piece)
+				self.paused = True
 				self.piece_list[row][column].set_piece(piece.promote(self.turn, row, column, self.canvas))
+				self.paused = False
 				piece_list.insert(0, self.get_piece(row, column))
 			self.flip_turn()
 			if self.is_in_checkmate(self.turn):
